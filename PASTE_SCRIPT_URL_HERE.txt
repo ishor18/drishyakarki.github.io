@@ -1,0 +1,6 @@
+PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
+
+After following the setup guide (GOOGLE_SHEETS_SETUP.md), paste your deployment URL here.
+
+It should look like:
+https://script.google.com/macros/s/AKfycbz.../exec

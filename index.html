@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Portfolio of Drishya Karki, Research Engineer at KAUST specializing in Video Understanding, Efficient Model Design, and spatiotemporal learning.">
+    <meta name="keywords"
+        content="Drishya Karki, Deep Learning, Research Engineer, KAUST, Video Understanding, AI, Machine Learning, Portfolio">
+    <title>Drishya Karki | Research Engineer @ KAUST</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">Drishya<span>.</span></a>
+            <div class="nav-links" id="navLinks">
+                <a href="#about">About</a>
+                <a href="#research">Research</a>
+                <a href="#projects">Projects</a>
+                <a href="#skills">Skills</a>
+                <a href="#contact" class="nav-cta">Get In Touch</a>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h5 class="hero-subtitle animate-up">Hello, I'm</h5>
+            <h1 class="hero-title animate-up delay-1">Drishya Karki</h1>
+            <p class="hero-description animate-up delay-2">
+                Research Engineer at <strong>KAUST</strong> specializing in <span>Video Understanding</span> and
+                <span>Efficient Model Design</span>.
+            </p>
+            <div class="hero-buttons animate-up delay-3">
+                <a href="#research" class="btn btn-primary">View Research</a>
+                <a href="#projects" class="btn btn-secondary">See Projects</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about section" id="about">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">About Me</h2>
+                <div class="section-line"></div>
+            </div>
+            <div class="about-grid">
+                <div class="about-image">
+                    <div class="profile-img-wrapper">
+                        <img src="dk.jpg" alt="Drishya Karki" class="profile-img">
+                    </div>
+                </div>
+                <div class="about-content">
+                    <div class="about-text">
+                        <p>
+                            I am a researcher passionate about pushing the boundaries of <strong>Deep Learning</strong>,
+                            specifically in the realms of video understanding, spatiotemporal learning, and efficient
+                            model design. Currently working as a <strong>Research Engineer at KAUST</strong> (King
+                            Abdullah University of Science and Technology), my work focuses on action recognition and
+                            representation learning from video data.
+                        </p>
+                        <p>
+                            Beyond research, I am a dedicated open-source developer, committed to bridging the gap
+                            between cutting-edge academic research and real-world software applications. I believe in
+                            building tools that make complex AI technologies accessible and efficient.
+                        </p>
+                        <div class="about-info">
+                            <div class="info-item">
+                                <span class="info-label">Current Role:</span>
+                                <span class="info-value">Research Engineer @ KAUST</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Education:</span>
+                                <span class="info-value">Bachelor in Computer Engineering, Pokhara University</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Location:</span>
+                                <span class="info-value">Arjundhara-05, Jhapa, Nepal</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Research Section -->
+    <section class="research section" id="research">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Research Focus</h2>
+                <div class="section-line"></div>
+            </div>
+            <div class="research-list" id="researchContainer">
+                <!-- Research items will be injected here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section class="projects section" id="projects">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Featured Projects</h2>
+                <div class="section-line"></div>
+            </div>
+            <div class="project-grid" id="projectsContainer">
+                <!-- Project cards will be injected here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section class="skills section" id="skills">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Technical Expertise</h2>
+                <div class="section-line"></div>
+            </div>
+            <div class="skills-container">
+                <div class="skill-category">
+                    <h3>Deep Learning & AI</h3>
+                    <div class="skill-tags">
+                        <span>PyTorch</span>
+                        <span>Scikit-learn</span>
+                        <span>NumPy</span>
+                        <span>Pandas</span>
+                        <span>HuggingFace</span>
+                        <span>OpenCV</span>
+                        <span>NLP</span>
+                        <span>Computer Vision</span>
+                    </div>
+                </div>
+                <div class="skill-category">
+                    <h3>Programming</h3>
+                    <div class="skill-tags">
+                        <span>Python</span>
+                        <span>C++</span>
+                        <span>JavaScript</span>
+                        <span>TypeScript</span>
+                        <span>Dart</span>
+                    </div>
+                </div>
+                <div class="skill-category">
+                    <h3>Frameworks & Tools</h3>
+                    <div class="skill-tags">
+                        <span>React</span>
+                        <span>Flutter</span>
+                        <span>Flask</span>
+                        <span>FastAPI</span>
+                        <span>Linux</span>
+                        <span>Git</span>
+                        <span>Docker</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact section" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Get In Touch</h2>
+                <div class="section-line"></div>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h4>Email</h4>
+                            <a href="mailto:karkidrishya1@gmail.com"
+                                style="color: inherit; text-decoration: none; transition: color 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='inherit'">Send me an email</a>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fab fa-whatsapp"></i>
+                        <div>
+                            <h4>WhatsApp</h4>
+                            <a href="https://wa.me/9779816023314" target="_blank"
+                                style="color: inherit; text-decoration: none; transition: color 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='inherit'">+977 9816023314</a>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-location-dot"></i>
+                        <div>
+                            <h4>Location</h4>
+                            <a href="https://www.google.com/maps/search/?api=1&query=Arjundhara-05+Jhapa+Nepal"
+                                target="_blank" style="color: inherit; text-decoration: none; transition: color 0.3s;"
+                                onmouseover="this.style.color='var(--primary-color)'"
+                                onmouseout="this.style.color='inherit'">Arjundhara-05, Jhapa, Nepal</a>
+                        </div>
+                    </div>
+                    <div class="social-links">
+                        <a href="https://np.linkedin.com/in/drishya-karki" target="_blank"><i
+                                class="fab fa-linkedin-in"></i></a>
+                        <a href="https://github.com/drishyakarki" target="_blank"><i class="fab fa-github"></i></a>
+                        <a href="https://scholar.google.com/citations?user=kEiZrhYAAAAJ&hl=en" target="_blank"><i
+                                class="fas fa-graduation-cap"></i></a>
+                        <a href="https://www.researchgate.net/profile/Drishya-Karki" target="_blank"><i
+                                class="fab fa-researchgate"></i></a>
+                    </div>
+                </div>
+                <form class="contact-form" id="contact-form">
+                    <div class="form-group">
+                        <input type="text" name="from_name" placeholder="Your Name" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" name="from_email" placeholder="Your Email" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Drishya Karki. All rights reserved.</p>
+            <p class="footer-note">Designed for high-performance AI research.</p>
+        </div>
+    </footer>
+
+    <!-- Custom JS -->
+    <script src="script.js"></script>
+</body>
+
+</html>
