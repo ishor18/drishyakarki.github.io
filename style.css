@@ -420,7 +420,9 @@ ul {
     align-items: flex-start;
     transition: var(--transition);
 }
-
+.research-item:hover {
+    cursor: pointer; /* Changes to the hand symbol */
+}
 .research-item:hover {
     border-color: var(--primary-color);
     transform: translateX(10px);
@@ -727,3 +729,4 @@ footer p {
     }
 
 }
+
