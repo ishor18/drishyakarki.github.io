@@ -68,5 +68,6 @@ Drishya karki/
 
 ---
 
-**Designed by Antigravity for Drishya Karki**
+**Designed by Ishor Acharya for Drishya Karki**
+
 
