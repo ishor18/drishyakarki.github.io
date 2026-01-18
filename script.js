@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 3,
             title: "TongueTechies",
             description: "It is primarily focused on the development of IndigeTranslate, an application designed to bridge language gaps for indigenous communities..",
-            tags: ["Python", "Dart", " Jupyter Notebook"],
+            tags: ["Python", "Jupyter Notebook", "Dart"],
             link: "https://github.com/TongueTechies/",
             icon: "fas fa-language"
         }
@@ -250,4 +250,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
 
