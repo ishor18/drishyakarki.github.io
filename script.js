@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
             title: "7amba",
             description: "A conversational AI assistant based on a fine-tuned Mamba model, deployed on HuggingFace.",
             tags: ["NLP", "Mamba", "HuggingFace"],
-            link: "https://huggingface.co/drishyakarki/7amba",
+            link: "https://github.com/drishyakarki/7amba",
             icon: "fas fa-robot"
         },
         {
@@ -19,10 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         {
             id: 3,
-            title: "IndigeTranslate",
-            description: "Flutter app for bilingual translation (NepalBhasa to English) using custom Seq2Seq + TTS.",
-            tags: ["Flutter", "NLP", "Deep Learning"],
-            link: "https://github.com/drishyakarki/IndigeTranslate",
+            title: "TongueTechies",
+            description: "It is primarily focused on the development of IndigeTranslate, an application designed to bridge language gaps for indigenous communities..",
+            tags: ["Python", "Dart", " Jupyter Notebook"],
+            link: "https://github.com/TongueTechies/",
             icon: "fas fa-language"
         }
     ];
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
             title: "Pixels or Positions? Benchmarking Modalities in Group Activity Recognition",
             description: "A study on broadcasting video vs. agent tracking in team sports like soccer. Submitted to CVPR 2025.",
             tag: "Nov 2025",
-            link: "https://www.researchgate.net/profile/Drishya-Karki",
+            link: "https://arxiv.org/abs/2511.12606",
             icon: "fas fa-video"
         },
         {
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             title: "EasyMath: A 0-shot Math Benchmark for SLMs",
             description: "A benchmark for small language models (SLMs) on arithmetic and algebraic problems.",
             tag: "May 2025",
-            link: "https://github.com/drishyakarki/EasyMath",
+            link: "https://arxiv.org/abs/2505.14852",
             icon: "fas fa-microchip"
         }
     ];
@@ -250,3 +250,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
