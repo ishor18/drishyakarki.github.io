@@ -471,7 +471,9 @@ ul {
     overflow: hidden;
     transition: var(--transition);
 }
-
+.project-card:hover {
+    cursor: pointer; /* Changes to the hand symbol */
+}
 .project-card:hover {
     transform: translateY(-10px);
     border-color: var(--primary-color);
@@ -723,4 +725,5 @@ footer p {
         margin: 5px 0;
         transition: var(--transition);
     }
+
 }
