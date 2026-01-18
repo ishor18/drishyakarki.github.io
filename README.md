@@ -16,8 +16,8 @@
 
 ### 3. **Admin Access Credentials**
 ```
-Email: karkidrishya1@gmail.com
-Password: Drishya@123
+Email: 
+Password: 
 ```
 
 ## How to Use
@@ -69,3 +69,4 @@ Drishya karki/
 ---
 
 **Designed by Antigravity for Drishya Karki**
+
