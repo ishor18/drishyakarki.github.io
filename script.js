@@ -46,11 +46,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ];
 
-    // Initialize LocalStorage if empty
-    if (!localStorage.getItem('projects')) {
+    // Initialize LocalStorage if empty or outdated
+    const storedProjects = localStorage.getItem('projects');
+    const storedResearch = localStorage.getItem('research');
+
+    // Simple check: if stored projects don't have 'title', they are likely from an old version
+    let forceReset = false;
+    try {
+        if (storedProjects) {
+            const parsed = JSON.parse(storedProjects);
+            if (parsed.length > 0 && !parsed[0].title) forceReset = true;
+        }
+    } catch (e) { forceReset = true; }
+
+    if (!storedProjects || forceReset) {
         localStorage.setItem('projects', JSON.stringify(initialProjects));
     }
-    if (!localStorage.getItem('research')) {
+    if (!storedResearch || forceReset) {
         localStorage.setItem('research', JSON.stringify(initialResearch));
     }
 
@@ -63,16 +75,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const researchContainer = document.getElementById('researchContainer');
 
         if (projectsContainer) {
-            projectsContainer.innerHTML = projects.map(p => `
+            projectsContainer.innerHTML = projects
+                .filter(p => p && p.title)
+                .map(p => `
                 <div class="project-card" onclick="window.open('${p.link}', '_blank')">
                     <div class="project-img">
                         <i class="${p.icon || 'fas fa-code'}"></i>
                     </div>
                     <div class="project-info">
-                        <h3>${p.title}</h3>
-                        <p>${p.description}</p>
+                        <h3>${p.title || 'Untitled Project'}</h3>
+                        <p>${p.description || 'No description available.'}</p>
                         <div class="project-tags">
-                            ${p.tags.map(t => `<span>${t}</span>`).join('')}
+                            ${(p.tags || []).map(t => `<span>${t}</span>`).join('')}
                         </div>
                         <div class="project-links">
                             <a href="${p.link}" target="_blank" onclick="event.stopPropagation()"><i class="fab fa-github"></i> View</a>
@@ -83,13 +97,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (researchContainer) {
-            researchContainer.innerHTML = research.map(r => `
+            researchContainer.innerHTML = research
+                .filter(r => r && r.title)
+                .map(r => `
                 <div class="research-item" onclick="window.open('${r.link}', '_blank')">
                     <div class="research-icon"><i class="${r.icon || 'fas fa-file-alt'}"></i></div>
                     <div class="research-details">
-                        <h3 class="research-title">${r.title}</h3>
-                        <p>${r.description}</p>
-                        <span class="research-tag">${r.tag}</span>
+                        <h3 class="research-title">${r.title || 'Untitled Research'}</h3>
+                        <p>${r.description || 'No description available.'}</p>
+                        <span class="research-tag">${r.tag || ''}</span>
                     </div>
                 </div>
             `).join('');
@@ -165,6 +181,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.animate-up, .section, .skill-category').forEach(el => {
         window.observer.observe(el);
+    });
+
+    // --- Navbar Active State on Scroll ---
+    const navLinksList = document.querySelectorAll('.nav-links a');
+    const sectionObserverOptions = {
+        threshold: 0.5,
+        rootMargin: '0px'
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.getAttribute('id');
+                if (id) {
+                    navLinksList.forEach(link => {
+                        link.classList.remove('active-link');
+                        if (link.getAttribute('href') === `#${id}`) {
+                            link.classList.add('active-link');
+                        }
+                    });
+                }
+            }
+        });
+    }, sectionObserverOptions);
+
+    document.querySelectorAll('section[id]').forEach(section => {
+        sectionObserver.observe(section);
     });
 
     // --- EmailJS Integration ---

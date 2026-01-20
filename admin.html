@@ -8,224 +8,788 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         :root {
             --primary-color: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            --secondary-color: #8b5cf6;
             --bg-dark: #0a0a0b;
             --bg-card: #161618;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body {
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
+            margin: 0;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            margin: 0;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 0% 0%, rgba(139, 92, 246, 0.05) 0%, transparent 30%);
+            z-index: -1;
         }
 
         .admin-container {
             width: 100%;
-            max-width: 900px;
+            max-width: 1000px;
             padding: 2rem;
+            position: relative;
+            z-index: 1;
         }
 
+        /* Login Card Redesign */
         .login-card {
-            background: var(--bg-card);
-            padding: 3rem;
-            border-radius: 24px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 1.5rem 1.2rem;
+            border-radius: 16px;
             border: 1px solid var(--glass-border);
-            max-width: 400px;
+            width: 100%;
+            max-width: 280px;
             margin: 0 auto;
             text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: cardAppear 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
         }
 
-        .dashboard-card {
-            background: var(--bg-card);
-            padding: 2rem;
-            border-radius: 24px;
-            border: 1px solid var(--glass-border);
-            display: none;
+        @keyframes cardAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        h2 {
-            margin-bottom: 2rem;
+        .login-card h2 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 0.4rem;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-card p.subtitle {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 1.8rem;
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             text-align: left;
+            width: 100%;
+            overflow: hidden;
         }
 
-        label {
+        .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.6rem;
+            color: var(--text-main);
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding-left: 0.5rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
             color: var(--text-muted);
+            font-size: 0.9rem;
+            transition: var(--transition);
         }
 
         input,
         textarea,
         select {
-            width: 100%;
-            padding: 0.8rem;
-            background: #0d0d0e;
+            display: block;
+            width: 100% !important;
+            max-width: 100%;
+            box-sizing: border-box !important;
+            padding: 0.5rem 0.6rem 0.5rem 2.2rem;
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--glass-border);
             border-radius: 8px;
             color: white;
             font-family: inherit;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            outline: none;
+            margin: 0;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.05);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+        }
+
+        .input-wrapper:focus-within i {
+            color: var(--primary-color);
         }
 
         .btn {
             width: 100%;
-            padding: 1rem;
+            padding: 0.6rem;
             border-radius: 8px;
             border: none;
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 0.85rem;
             cursor: pointer;
-            transition: 0.3s;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
         }
 
         .btn-primary {
-            background: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             color: white;
+            box-shadow: 0 4px 20px var(--primary-glow);
         }
 
         .btn-primary:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px var(--primary-glow);
+            filter: brightness(1.1);
         }
 
-        .btn-logout {
-            background: #ef4444;
-            color: white;
-            width: auto;
-            padding: 0.5rem 1rem;
+        /* Dashboard Enhancements */
+        @media (min-width: 768px) {
+            .admin-container.logged-in {
+                max-width: 1200px;
+                display: grid;
+                grid-template-columns: 240px 1fr;
+                gap: 2rem;
+                align-items: start;
+            }
         }
 
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .tabs {
-            display: flex;
+        .sidebar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            display: none;
+            flex-direction: column;
             gap: 1rem;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--glass-border);
-            padding-bottom: 1rem;
+            position: sticky;
+            top: 2rem;
         }
 
-        .tab {
-            cursor: pointer;
+        .admin-container.logged-in .sidebar {
+            display: flex;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
             color: var(--text-muted);
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
             font-weight: 500;
         }
 
-        .tab.active {
+        .nav-btn:hover,
+        .nav-btn.active {
+            background: rgba(59, 130, 246, 0.1);
             color: var(--primary-color);
         }
 
-        .list-items {
-            margin-top: 2rem;
-        }
-
-        .list-item {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 1rem;
-            border-radius: 12px;
-            margin-bottom: 1rem;
+        /* Segmented Control Tabs */
+        .tabs {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px;
+            border-radius: 12px;
+            gap: 4px;
+            border: 1px solid var(--glass-border);
         }
 
-        .item-info h4 {
+        .tab {
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: var(--transition);
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .tab.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            padding: 1.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            text-align: left;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+        }
+
+        .stat-card i {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .stat-card h3 {
+            font-size: 0.9rem;
+            color: var(--text-muted);
             margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .item-actions {
+        .stat-card p {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0 0 0;
+            color: var(--text-main);
+        }
+
+        .dashboard-content {
+            display: none;
+            width: 100%;
+        }
+
+        .admin-container.logged-in .dashboard-content {
+            display: block;
+        }
+
+        .dashboard-card {
+            background: var(--glass-bg);
+            padding: 2rem;
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            display: block;
+            /* Managed by JS show/hide */
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        .item-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            padding: 1.2rem;
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            display: grid;
+            grid-template-columns: 50px 1fr auto;
+            align-items: center;
+            gap: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .item-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: var(--primary-color);
+        }
+
+        .item-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .item-details h4 {
+            margin: 0 0 0.3rem 0;
+            font-size: 1.1rem;
+        }
+
+        .item-details p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .action-btns {
             display: flex;
             gap: 0.5rem;
         }
 
-        .btn-delete {
-            color: #ef4444;
+        .btn-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            background: none;
-            border: none;
+            transition: var(--transition);
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-muted);
+        }
+
+        .btn-edit:hover {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .btn-delete:hover {
+            color: #ef4444;
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .data-management {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            padding: 0.7rem 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--text-main);
+            color: var(--text-main);
+        }
+
+        /* Modal styling */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: cardAppear 0.4s ease-out;
+        }
+
+        .back-to-site {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: var(--transition);
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            border: 1px solid transparent;
+        }
+
+        .back-to-site:hover {
+            color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.05);
+            border-color: rgba(59, 130, 246, 0.1);
+        }
+
+        #loginError {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            padding: 0.8rem;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+            font-weight: 500;
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
     </style>
 </head>
 
 <body>
-    <div class="admin-container">
+    <div class="admin-container" id="adminContainer">
         <!-- Login Form -->
         <div id="loginCard" class="login-card">
-            <h2>Admin Login</h2>
+            <h2>Admin Access</h2>
+            <p class="subtitle">Secure workspace for Drishya Karki</p>
             <form id="loginForm">
                 <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="email" required placeholder="adminname@gmail.com">
+                    <label>Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" required placeholder="adminname@gmail.com">
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" id="password" required placeholder="••••••••">
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" required placeholder="••••••••">
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Login</button>
+                <button type="submit" class="btn btn-primary">Sign In &rarr;</button>
             </form>
-            <p id="loginError" style="color: #ef4444; margin-top: 1rem; font-size: 0.9rem; display: none;">Invalid
-                credentials</p>
+            <p id="loginError" style="display: none;">Access Denied: Invalid credentials</p>
+            <p class="toggle-auth" style="margin-top: 1.2rem; font-size: 0.8rem; color: var(--text-muted);">
+                Don't have an account? <a href="#" onclick="toggleAuth('signup')"
+                    style="color: var(--primary-color); text-decoration: none; font-weight: 600;">Create one</a>
+            </p>
+            <a href="index.html" class="back-to-site">
+                <i class="fas fa-arrow-left"></i> Back to Website
+            </a>
         </div>
 
-        <!-- Dashboard -->
-        <div id="dashboardCard" class="dashboard-card">
-            <div class="dashboard-header">
-                <h2>Dashboard</h2>
-                <button class="btn btn-logout" onclick="logout()">Logout</button>
-            </div>
+        <!-- Signup Form -->
+        <div id="signupCard" class="login-card" style="display: none;">
+            <h2>Create Account</h2>
+            <p class="subtitle">Join the administrative board</p>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="signupName" required placeholder="Drishya Karki">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="signupEmail" required placeholder="adminname@gmail.com">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Security Key</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-shield-halved"></i>
+                        <input type="password" id="signupKey" required placeholder="Enter Secret Key">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="signupPass" required placeholder="••••••••">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Register Account &rarr;</button>
+            </form>
+            <p id="signupError" style="display: none;">Registration Failed: Invalid Key</p>
+            <p class="toggle-auth" style="margin-top: 1.2rem; font-size: 0.8rem; color: var(--text-muted);">
+                Already have an account? <a href="#" onclick="toggleAuth('login')"
+                    style="color: var(--primary-color); text-decoration: none; font-weight: 600;">Sign in here</a>
+            </p>
+            <a href="index.html" class="back-to-site">
+                <i class="fas fa-arrow-left"></i> Back to Website
+            </a>
+        </div>
 
-            <div class="tabs">
-                <div class="tab active" onclick="switchTab('projects')">Add Project</div>
-                <div class="tab" onclick="switchTab('research')">Add Research</div>
+        <!-- Sidebar (Visible when logged in) -->
+        <aside class="sidebar" id="sidebar">
+            <div style="margin-bottom: 2rem; padding: 0.5rem;">
+                <h2 style="font-size: 1.2rem; margin: 0; color: var(--primary-color);">Admin Pro</h2>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">Management Portal</p>
             </div>
+            <button class="nav-btn active" onclick="switchMainTab('overview')">
+                <i class="fas fa-chart-line"></i> Overview
+            </button>
+            <button class="nav-btn" onclick="switchMainTab('content')">
+                <i class="fas fa-edit"></i> Manage Content
+            </button>
+            <button class="nav-btn" onclick="switchMainTab('data')">
+                <i class="fas fa-database"></i> Data & Backup
+            </button>
+            <div style="margin-top: auto; padding-top: 2rem;">
+                <a href="index.html" class="nav-btn" style="text-decoration: none;">
+                    <i class="fas fa-external-link-alt"></i> View Site
+                </a>
+                <button class="nav-btn" onclick="logout()" style="color: #ef4444; width: 100%;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
 
-            <form id="addForm">
-                <input type="hidden" id="itemType" value="projects">
+        <!-- Main Dashboard Content -->
+        <main class="dashboard-content" id="dashboardContent">
+            <!-- Overview Tab -->
+            <section id="overviewSection">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-project-diagram"></i>
+                        <h3>Total Projects</h3>
+                        <p id="statProjects">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-microscope"></i>
+                        <h3>Research Papers</h3>
+                        <p id="statResearch">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-user-shield"></i>
+                        <h3>Admin Status</h3>
+                        <p style="font-size: 1.2rem; color: var(--primary-color);">Verified</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <h3>Recent Activity</h3>
+                    <div id="activityLog" style="color: var(--text-muted); font-size: 0.9rem;">
+                        Waiting for new actions...
+                    </div>
+                </div>
+            </section>
+
+            <!-- Content Management Tab -->
+            <section id="contentSection" style="display: none;">
+                <div class="dashboard-card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h3 style="margin: 0;">Add New Content</h3>
+                        <div class="tabs" style="margin: 0;">
+                            <div class="tab active" id="tabProjects" onclick="switchContentType(event, 'projects')">
+                                Projects</div>
+                            <div class="tab" id="tabResearch" onclick="switchContentType(event, 'research')">Research
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="addForm">
+                        <input type="hidden" id="itemType" value="projects">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label>Title</label>
+                                <input type="text" id="itemTitle" required placeholder="E.g. Portfolio Website">
+                            </div>
+                            <div class="form-group">
+                                <label>Link (URL)</label>
+                                <input type="url" id="itemLink" required placeholder="https://...">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea id="itemDesc" rows="2" required
+                                placeholder="Tell us more about this work..."></textarea>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group" id="tagsGroup">
+                                <label>Tags (Comma separated)</label>
+                                <input type="text" id="itemTags" placeholder="HTML, CSS, JS">
+                            </div>
+                            <div class="form-group" id="tagGroup" style="display: none;">
+                                <label>Date/Tag</label>
+                                <input type="text" id="itemTag" placeholder="Nov 2025">
+                            </div>
+                            <div class="form-group">
+                                <label>Icon (FontAwesome)</label>
+                                <input type="text" id="itemIcon" value="fas fa-code">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+                            <i class="fas fa-plus"></i> Add New Item
+                        </button>
+                    </form>
+                </div>
+
+                <div class="dashboard-card">
+                    <h3 id="currentListTitle">Current Projects</h3>
+                    <div id="itemsList">
+                        <!-- Items list populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data & Backup Tab -->
+            <section id="dataSection" style="display: none;">
+                <div class="dashboard-card">
+                    <h3>Data Management</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;">
+                        Keep your portfolio backup safe. You can export all your projects and research papers as a
+                        single JSON file and restore them later.
+                    </p>
+                    <div class="data-management" style="flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="exportData()">
+                            <i class="fas fa-download"></i> Export JSON Backup
+                        </button>
+                        <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">
+                            <i class="fas fa-upload"></i> Import Backup
+                        </button>
+                        <button class="btn btn-outline" style="border-color: #f59e0b; color: #f59e0b;"
+                            onclick="restoreDefaults()">
+                            <i class="fas fa-undo"></i> Restore Initial Data
+                        </button>
+                        <input type="file" id="importFile" style="display: none;" accept=".json"
+                            onchange="importData(event)">
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="editModalTitle">Edit Item</h3>
+            <form id="editForm">
+                <input type="hidden" id="editId">
+                <input type="hidden" id="editType">
                 <div class="form-group">
                     <label>Title</label>
-                    <input type="text" id="itemTitle" required>
+                    <input type="text" id="editTitle" required>
                 </div>
                 <div class="form-group">
                     <label>Description</label>
-                    <textarea id="itemDesc" rows="3" required></textarea>
+                    <textarea id="editDesc" rows="3" required></textarea>
                 </div>
-                <div class="form-group" id="tagsGroup">
+                <div class="form-group" id="editTagsGroup">
                     <label>Tags (Comma separated)</label>
-                    <input type="text" id="itemTags">
+                    <input type="text" id="editTags">
                 </div>
-                <div class="form-group" id="tagGroup" style="display: none;">
-                    <label>Date/Tag (e.g. Nov 2025)</label>
-                    <input type="text" id="itemTag">
+                <div class="form-group" id="editTagGroup">
+                    <label>Date/Tag</label>
+                    <input type="text" id="editTag">
                 </div>
                 <div class="form-group">
                     <label>Link (URL)</label>
-                    <input type="url" id="itemLink" required>
+                    <input type="url" id="editLink" required>
                 </div>
                 <div class="form-group">
-                    <label>Icon (FontAwesome class, e.g. fas fa-robot)</label>
-                    <input type="text" id="itemIcon" value="fas fa-code">
+                    <label>Icon</label>
+                    <input type="text" id="editIcon">
                 </div>
-                <button type="submit" class="btn btn-primary">Save Item</button>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="submit" class="btn btn-primary">Update Changes</button>
+                    <button type="button" class="btn btn-outline" onclick="closeEditModal()">Cancel</button>
+                </div>
             </form>
+        </div>
+    </div>
 
-            <div class="list-items" id="itemsList">
-                <!-- Items list populated by JS -->
+    <!-- Confirm Delete Modal -->
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div
+                style="width: 60px; height: 60px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 1.5rem;">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+            <h3>Confirm Deletion</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;">Are you sure you want to delete
+                this item? This action cannot be undone.</p>
+            <div style="display: flex; gap: 1rem;">
+                <button id="confirmDeleteBtn" class="btn" style="background: #ef4444; color: white;">Delete
+                    Permanently</button>
+                <button class="btn btn-outline" onclick="closeDeleteModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Restore Modal -->
+    <div id="restoreModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div
+                style="width: 60px; height: 60px; background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 1.5rem;">
+                <i class="fas fa-undo"></i>
+            </div>
+            <h3>Restore Initial Data</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;">This will delete all current
+                changes and restore the original portfolio data. This action cannot be undone.</p>
+            <div style="display: flex; gap: 1rem;">
+                <button id="confirmRestoreBtn" class="btn" style="background: #f59e0b; color: white;">Restore
+                    Now</button>
+                <button class="btn btn-outline" onclick="closeRestoreModal()">Cancel</button>
             </div>
         </div>
     </div>
@@ -233,12 +797,29 @@
     <script>
         const ADMIN_EMAIL = "karkidrishya1@gmail.com";
         const ADMIN_PASS = "Drishya@123";
+        const SECRET_KEY = "DRISHYA_ADMIN_2026";
 
         const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
         const loginCard = document.getElementById('loginCard');
-        const dashboardCard = document.getElementById('dashboardCard');
+        const signupCard = document.getElementById('signupCard');
+        const adminContainer = document.getElementById('adminContainer');
+        const sidebar = document.getElementById('sidebar');
+        const dashboardContent = document.getElementById('dashboardContent');
         const addForm = document.getElementById('addForm');
+        const editForm = document.getElementById('editForm');
         const itemsList = document.getElementById('itemsList');
+
+        // Toggle Auth Forms
+        window.toggleAuth = (type) => {
+            if (type === 'signup') {
+                loginCard.style.display = 'none';
+                signupCard.style.display = 'block';
+            } else {
+                loginCard.style.display = 'block';
+                signupCard.style.display = 'none';
+            }
+        };
 
         // Login Logic
         loginForm.addEventListener('submit', (e) => {
@@ -246,17 +827,50 @@
             const email = document.getElementById('email').value;
             const pass = document.getElementById('password').value;
 
-            if (email === ADMIN_EMAIL && pass === ADMIN_PASS) {
+            if ((email === ADMIN_EMAIL && pass === ADMIN_PASS) ||
+                (JSON.parse(localStorage.getItem('adminAccounts') || '[]').find(u => u.email === email && u.password === pass))) {
                 sessionStorage.setItem('isAdmin', 'true');
                 showDashboard();
             } else {
-                document.getElementById('loginError').style.display = 'block';
+                const error = document.getElementById('loginError');
+                error.style.display = 'block';
+                error.textContent = "Access Denied: Invalid credentials";
             }
+        });
+
+        // Signup Logic
+        signupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const key = document.getElementById('signupKey').value;
+            const pass = document.getElementById('signupPass').value;
+            const error = document.getElementById('signupError');
+
+            if (key !== SECRET_KEY) {
+                error.style.display = 'block';
+                error.textContent = "Registration Failed: Invalid Security Key";
+                return;
+            }
+
+            const storedAdmins = JSON.parse(localStorage.getItem('adminAccounts') || '[]');
+            if (storedAdmins.some(u => u.email === email)) {
+                error.style.display = 'block';
+                error.textContent = "Registration Failed: Email already registered";
+                return;
+            }
+
+            storedAdmins.push({ name, email, password: pass });
+            localStorage.setItem('adminAccounts', JSON.stringify(storedAdmins));
+            alert('Account created successfully! You can now sign in.');
+            toggleAuth('login');
         });
 
         const showDashboard = () => {
             loginCard.style.display = 'none';
-            dashboardCard.style.display = 'block';
+            signupCard.style.display = 'none';
+            adminContainer.classList.add('logged-in');
+            updateStats();
             renderItems();
         };
 
@@ -269,23 +883,34 @@
             showDashboard();
         }
 
-        // Tab Switching
-        const switchTab = (type) => {
+        // Main Tab Switching (Overview, Content, Data)
+        window.switchMainTab = (tab) => {
+            document.querySelectorAll('main section').forEach(s => s.style.display = 'none');
+            document.getElementById(tab + 'Section').style.display = 'block';
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`[onclick="switchMainTab('${tab}')"]`).classList.add('active');
+            if (tab === 'overview') updateStats();
+        };
+
+        // Content Sub-Tab Switching (Projects vs Research)
+        window.switchContentType = (event, type) => {
             document.getElementById('itemType').value = type;
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
 
-            if (type === 'projects') {
-                document.getElementById('tagsGroup').style.display = 'block';
-                document.getElementById('tagGroup').style.display = 'none';
-            } else {
-                document.getElementById('tagsGroup').style.display = 'none';
-                document.getElementById('tagGroup').style.display = 'block';
-            }
+            document.getElementById('tagsGroup').style.display = type === 'projects' ? 'block' : 'none';
+            document.getElementById('tagGroup').style.display = type === 'research' ? 'block' : 'none';
+            document.getElementById('currentListTitle').textContent = `Current ${type.charAt(0).toUpperCase() + type.slice(1)}`;
             renderItems();
         };
 
-        // CRUD Logic
+        // Stats Update
+        const updateStats = () => {
+            document.getElementById('statProjects').textContent = (JSON.parse(localStorage.getItem('projects')) || []).length;
+            document.getElementById('statResearch').textContent = (JSON.parse(localStorage.getItem('research')) || []).length;
+        };
+
+        // Add Item
         addForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const type = document.getElementById('itemType').value;
@@ -299,47 +924,240 @@
                 icon: document.getElementById('itemIcon').value
             };
 
-            if (type === 'projects') {
-                newItem.tags = document.getElementById('itemTags').value.split(',').map(t => t.trim());
-            } else {
-                newItem.tag = document.getElementById('itemTag').value;
-            }
+            if (type === 'projects') newItem.tags = document.getElementById('itemTags').value.split(',').map(t => t.trim());
+            else newItem.tag = document.getElementById('itemTag').value;
 
             items.unshift(newItem);
             localStorage.setItem(type, JSON.stringify(items));
             addForm.reset();
             renderItems();
-            alert('Item added successfully!');
+            updateStats();
+            logActivity(`Added new ${type.slice(0, -1)}: ${newItem.title}`);
         });
 
-        const deleteItem = (type, id) => {
-            if (confirm('Are you sure you want to delete this item?')) {
-                let items = JSON.parse(localStorage.getItem(type));
-                items = items.filter(i => i.id !== id);
-                localStorage.setItem(type, JSON.stringify(items));
-                renderItems();
-            }
+        // Activity Logger
+        const logActivity = (msg) => {
+            const log = document.getElementById('activityLog');
+            if (log.innerText.includes('Waiting')) log.innerHTML = '';
+            const entry = document.createElement('div');
+            entry.style.padding = '0.5rem 0';
+            entry.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+            entry.innerHTML = `<span style="color:var(--primary-color)">[${new Date().toLocaleTimeString()}]</span> ${msg}`;
+            log.prepend(entry);
         };
 
+        // Delete Modal Logic
+        let pendingDelete = null;
+
+        window.deleteItem = (type, id) => {
+            pendingDelete = { type, id };
+            document.getElementById('deleteModal').style.display = 'flex';
+        };
+
+        window.closeDeleteModal = () => {
+            document.getElementById('deleteModal').style.display = 'none';
+            pendingDelete = null;
+        };
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+            if (!pendingDelete) return;
+            const { type, id } = pendingDelete;
+
+            let items = JSON.parse(localStorage.getItem(type)) || [];
+            const item = items.find(i => Number(i.id) === Number(id));
+
+            if (item) {
+                items = items.filter(i => Number(i.id) !== Number(id));
+                localStorage.setItem(type, JSON.stringify(items));
+                renderItems();
+                updateStats();
+                logActivity(`Deleted ${type.slice(0, -1)}: ${item.title}`);
+            }
+
+            closeDeleteModal();
+        });
+
+        // Edit Modal Logic
+        window.openEditModal = (type, id) => {
+            const items = JSON.parse(localStorage.getItem(type)) || [];
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+
+            document.getElementById('editId').value = id;
+            document.getElementById('editType').value = type;
+            document.getElementById('editTitle').value = item.title;
+            document.getElementById('editDesc').value = item.description;
+            document.getElementById('editLink').value = item.link;
+            document.getElementById('editIcon').value = item.icon || 'fas fa-code';
+
+            const tagsGroup = document.getElementById('editTagsGroup');
+            const tagGroup = document.getElementById('editTagGroup');
+
+            if (type === 'projects') {
+                tagsGroup.style.display = 'block';
+                tagGroup.style.display = 'none';
+                document.getElementById('editTags').value = (item.tags || []).join(', ');
+            } else {
+                tagsGroup.style.display = 'none';
+                tagGroup.style.display = 'block';
+                document.getElementById('editTag').value = item.tag || '';
+            }
+
+            document.getElementById('editModal').style.display = 'flex';
+        };
+
+        window.closeEditModal = () => {
+            document.getElementById('editModal').style.display = 'none';
+        };
+
+        editForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = parseInt(document.getElementById('editId').value);
+            const type = document.getElementById('editType').value;
+            let items = JSON.parse(localStorage.getItem(type)) || [];
+            const index = items.findIndex(i => i.id === id);
+
+            if (index !== -1) {
+                items[index].title = document.getElementById('editTitle').value;
+                items[index].description = document.getElementById('editDesc').value;
+                items[index].link = document.getElementById('editLink').value;
+                items[index].icon = document.getElementById('editIcon').value;
+
+                if (type === 'projects') items[index].tags = document.getElementById('editTags').value.split(',').map(t => t.trim());
+                else items[index].tag = document.getElementById('editTag').value;
+
+                localStorage.setItem(type, JSON.stringify(items));
+                renderItems();
+                closeEditModal();
+                logActivity(`Updated ${type.slice(0, -1)}: ${items[index].title}`);
+            }
+        });
+
+        // Render Items
         const renderItems = () => {
             const type = document.getElementById('itemType').value;
             const items = JSON.parse(localStorage.getItem(type)) || [];
-            itemsList.innerHTML = `<h3>Current ${type.charAt(0).toUpperCase() + type.slice(1)}</h3>`;
 
-            itemsList.innerHTML += items.map(i => `
-                <div class="list-item">
-                    <div class="item-info">
+            if (items.length === 0) {
+                itemsList.innerHTML = `<div style="text-align:center; padding: 2rem; color:var(--text-muted);">No ${type} found.</div>`;
+                return;
+            }
+
+            itemsList.innerHTML = items.map(i => `
+                <div class="item-card">
+                    <div class="item-icon"><i class="${i.icon || 'fas fa-code'}"></i></div>
+                    <div class="item-details">
                         <h4>${i.title}</h4>
-                        <p style="font-size: 0.8rem; color: var(--text-muted)">${i.link}</p>
+                        <p>${i.description}</p>
                     </div>
-                    <div class="item-actions">
-                        <button class="btn-delete" onclick="deleteItem('${type}', ${i.id})"><i class="fas fa-trash"></i></button>
+                    <div class="action-btns">
+                        <button class="btn-icon btn-edit" title="Edit" onclick="openEditModal('${type}', ${i.id})">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                        <button class="btn-icon btn-delete" title="Delete" onclick="deleteItem('${type}', ${i.id})">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                     </div>
                 </div>
             `).join('');
         };
+
+        // Data Export/Import
+        window.exportData = () => {
+            const data = {
+                projects: JSON.parse(localStorage.getItem('projects')) || [],
+                research: JSON.parse(localStorage.getItem('research')) || []
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `portfolio_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            logActivity('Exported full database backup');
+        };
+
+        window.importData = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.projects) localStorage.setItem('projects', JSON.stringify(data.projects));
+                    if (data.research) localStorage.setItem('research', JSON.stringify(data.research));
+                    alert('Data imported successfully!');
+                    location.reload();
+                } catch (err) {
+                    alert('Error: Invalid JSON file');
+                }
+            };
+            reader.readAsText(file);
+        };
+
+        // Restore Modal Logic
+        window.restoreDefaults = () => {
+            document.getElementById('restoreModal').style.display = 'flex';
+        };
+
+        window.closeRestoreModal = () => {
+            document.getElementById('restoreModal').style.display = 'none';
+        };
+
+        document.getElementById('confirmRestoreBtn').addEventListener('click', () => {
+            const initialProjects = [
+                {
+                    id: 1,
+                    title: "7amba",
+                    description: "A conversational AI assistant based on a fine-tuned Mamba model, deployed on HuggingFace.",
+                    tags: ["NLP", "Mamba", "HuggingFace"],
+                    link: "https://github.com/drishyakarki/7amba",
+                    icon: "fas fa-robot"
+                },
+                {
+                    id: 2,
+                    title: "GreenScan",
+                    description: "Web-integrated CNN (ResNet-18) for plant disease detection using a Flask API and React frontend.",
+                    tags: ["Computer Vision", "React", "Flask"],
+                    link: "https://github.com/drishyakarki/GreenScan",
+                    icon: "fas fa-leaf"
+                },
+                {
+                    id: 3,
+                    title: "TongueTechies",
+                    description: "It is primarily focused on the development of IndigeTranslate, an application designed to bridge language gaps for indigenous communities..",
+                    tags: ["Python", "Jupyter Notebook", "Dart"],
+                    link: "https://github.com/TongueTechies/",
+                    icon: "fas fa-language"
+                }
+            ];
+
+            const initialResearch = [
+                {
+                    id: 1,
+                    title: "Pixels or Positions? Benchmarking Modalities in Group Activity Recognition",
+                    description: "A study on broadcasting video vs. agent tracking in team sports like soccer. Submitted to CVPR 2025.",
+                    tag: "Nov 2025",
+                    link: "https://arxiv.org/abs/2511.12606",
+                    icon: "fas fa-video"
+                },
+                {
+                    id: 2,
+                    title: "EasyMath: A 0-shot Math Benchmark for SLMs",
+                    description: "A benchmark for small language models (SLMs) on arithmetic and algebraic problems.",
+                    tag: "May 2025",
+                    link: "https://arxiv.org/abs/2505.14852",
+                    icon: "fas fa-microchip"
+                }
+            ];
+
+            localStorage.setItem('projects', JSON.stringify(initialProjects));
+            localStorage.setItem('research', JSON.stringify(initialResearch));
+            logActivity('Restored portfolio to initial state');
+            location.reload();
+        });
     </script>
 </body>
-
 
 </html>
