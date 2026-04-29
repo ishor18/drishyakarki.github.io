@@ -620,7 +620,7 @@
                     </div>
                     <div class="stat-card">
                         <i class="fas fa-exclamation-circle"></i>
-                        <h3>Important Updates</h3>
+                        <h3>Recent Updates</h3>
                         <p id="statImportant">0</p>
                     </div>
                     <div class="stat-card">
@@ -649,7 +649,7 @@
                                 Projects</div>
                             <div class="tab" id="tabResearch" onclick="switchContentType(event, 'research')">Research
                             </div>
-                            <div class="tab" id="tabImportant" onclick="switchContentType(event, 'important')">Important
+                            <div class="tab" id="tabImportant" onclick="switchContentType(event, 'important')">Recent Updates
                             </div>
                         </div>
                     </div>
@@ -667,7 +667,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Description</label>
+                            <label id="descTitle">Description</label>
                             <textarea id="itemDesc" rows="2" required
                                 placeholder="Tell us more about this work..."></textarea>
                         </div>
@@ -677,8 +677,8 @@
                                 <input type="text" id="itemTags" placeholder="HTML, CSS, JS">
                             </div>
                             <div class="form-group" id="tagGroup" style="display: none;">
-                                <label>Date/Tag</label>
-                                <input type="text" id="itemTag" placeholder="Nov 2025">
+                                <label id="tagLabel">Date</label>
+                                <input type="date" id="itemTag">
                             </div>
                             <div class="form-group">
                                 <label>Icon (FontAwesome)</label>
@@ -738,7 +738,7 @@
                     <input type="text" id="editTitle" required>
                 </div>
                 <div class="form-group">
-                    <label>Description</label>
+                    <label id="editDescTitle">Description</label>
                     <textarea id="editDesc" rows="3" required></textarea>
                 </div>
                 <div class="form-group" id="editTagsGroup">
@@ -746,8 +746,8 @@
                     <input type="text" id="editTags">
                 </div>
                 <div class="form-group" id="editTagGroup">
-                    <label>Date/Tag</label>
-                    <input type="text" id="editTag">
+                    <label id="editTagLabel">Date</label>
+                    <input type="date" id="editTag">
                 </div>
                 <div class="form-group">
                     <label id="editLinkTitle">Link (URL)</label>
@@ -907,9 +907,14 @@
 
             document.getElementById('tagsGroup').style.display = type === 'projects' ? 'block' : 'none';
             document.getElementById('tagGroup').style.display = (type === 'research' || type === 'important') ? 'block' : 'none';
+            document.getElementById('tagLabel').textContent = type === 'important' ? 'Select Date' : 'Date/Tag';
+            document.getElementById('itemTag').type = (type === 'important' || type === 'research') ? 'date' : 'text';
             document.getElementById('linkTitle').textContent = type === 'important' ? 'Link (Optional)' : 'Link (URL)';
             document.getElementById('itemLink').required = type !== 'important';
-            document.getElementById('currentListTitle').textContent = `Current ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+            document.getElementById('itemDesc').required = type !== 'important';
+            document.getElementById('descTitle').textContent = type === 'important' ? 'Description (Optional)' : 'Description';
+            const displayType = type === 'important' ? 'Recent Updates' : type.charAt(0).toUpperCase() + type.slice(1);
+            document.getElementById('currentListTitle').textContent = `Current ${displayType}`;
             renderItems();
         };
 
@@ -942,7 +947,8 @@
             addForm.reset();
             renderItems();
             updateStats();
-            logActivity(`Added new ${type.slice(0, -1)}: ${newItem.title}`);
+            const logType = type === 'important' ? 'recent update' : type.slice(0, -1);
+            logActivity(`Added new ${logType}: ${newItem.title}`);
         });
 
         // Activity Logger
@@ -981,7 +987,8 @@
                 localStorage.setItem(type, JSON.stringify(items));
                 renderItems();
                 updateStats();
-                logActivity(`Deleted ${type.slice(0, -1)}: ${item.title}`);
+                const logType = type === 'important' ? 'recent update' : type.slice(0, -1);
+                logActivity(`Deleted ${logType}: ${item.title}`);
             }
 
             closeDeleteModal();
@@ -1014,7 +1021,11 @@
             }
 
             document.getElementById('editLink').required = type !== 'important';
+            document.getElementById('editTagLabel').textContent = type === 'important' ? 'Select Date' : 'Date/Tag';
+            document.getElementById('editTag').type = (type === 'important' || type === 'research') ? 'date' : 'text';
             document.getElementById('editLinkTitle').textContent = type === 'important' ? 'Link (Optional)' : 'Link (URL)';
+            document.getElementById('editDesc').required = type !== 'important';
+            document.getElementById('editDescTitle').textContent = type === 'important' ? 'Description (Optional)' : 'Description';
             document.getElementById('editModal').style.display = 'flex';
         };
 
@@ -1041,26 +1052,48 @@
                 localStorage.setItem(type, JSON.stringify(items));
                 renderItems();
                 closeEditModal();
-                logActivity(`Updated ${type.slice(0, -1)}: ${items[index].title}`);
+                const logType = type === 'important' ? 'recent update' : type.slice(0, -1);
+                logActivity(`Updated ${logType}: ${items[index].title}`);
             }
         });
 
         // Render Items
         const renderItems = () => {
             const type = document.getElementById('itemType').value;
-            const items = JSON.parse(localStorage.getItem(type)) || [];
+            let items = JSON.parse(localStorage.getItem(type)) || [];
+
+            const parseDate = (dateStr) => {
+                if (!dateStr) return 0;
+                const date = new Date(dateStr);
+                return isNaN(date.getTime()) ? 0 : date.getTime();
+            };
+
+            items.sort((a, b) => {
+                const dateA = parseDate(a.tag || (a.tags ? a.tags[0] : ''));
+                const dateB = parseDate(b.tag || (b.tags ? b.tags[0] : ''));
+                if (dateB === dateA) return b.id - a.id;
+                return dateB - dateA;
+            });
 
             if (items.length === 0) {
                 itemsList.innerHTML = `<div style="text-align:center; padding: 2rem; color:var(--text-muted);">No ${type} found.</div>`;
                 return;
             }
 
+            const formatDate = (dateStr) => {
+                if (!dateStr) return '';
+                const date = new Date(dateStr);
+                if (isNaN(date.getTime())) return dateStr;
+                return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+            };
+
             itemsList.innerHTML = items.map(i => `
                 <div class="item-card">
                     <div class="item-icon"><i class="${i.icon || 'fas fa-code'}"></i></div>
                     <div class="item-details">
                         <h4>${i.title}</h4>
-                        <p>${i.description}</p>
+                        <p style="font-size: 0.8rem; color: var(--primary-color); margin-bottom: 0.2rem;">${formatDate(i.tag || (i.tags ? i.tags[0] : ''))}</p>
+                        <p>${i.description || ''}</p>
                     </div>
                     <div class="action-btns">
                         <button class="btn-icon btn-edit" title="Edit" onclick="openEditModal('${type}', ${i.id})">

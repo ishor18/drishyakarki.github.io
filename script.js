@@ -90,6 +90,32 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('important', JSON.stringify(initialImportant));
     }
 
+    // --- Helper Functions ---
+    const parseDate = (dateStr) => {
+        if (!dateStr) return 0;
+        const date = new Date(dateStr);
+        return isNaN(date.getTime()) ? 0 : date.getTime();
+    };
+
+    const sortItems = (items) => {
+        return [...items].sort((a, b) => {
+            const dateA = parseDate(a.tag || (a.tags ? a.tags[0] : ''));
+            const dateB = parseDate(b.tag || (b.tags ? b.tags[0] : ''));
+            
+            if (dateB === dateA) return b.id - a.id;
+            return dateB - dateA;
+        });
+    };
+
+    const formatDate = (dateStr) => {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return dateStr; // Fallback to raw string if not a valid date
+        
+        // Format as "Nov 2025" or similar
+        return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    };
+
     // --- Dynamic Rendering ---
     const renderContent = () => {
         const projects = JSON.parse(localStorage.getItem('projects'));
@@ -101,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const importantContainer = document.getElementById('importantContainer');
 
         if (projectsContainer) {
-            projectsContainer.innerHTML = projects
+            projectsContainer.innerHTML = sortItems(projects)
                 .filter(p => p && p.title)
                 .map(p => `
                 <div class="project-card" onclick="window.open('${p.link}', '_blank')">
@@ -110,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="project-info">
                         <h3>${p.title || 'Untitled Project'}</h3>
-                        <p>${p.description || 'No description available.'}</p>
+                        ${p.description ? `<p>${p.description}</p>` : ''}
                         <div class="project-tags">
                             ${(p.tags || []).map(t => `<span>${t}</span>`).join('')}
                         </div>
@@ -123,22 +149,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (researchContainer) {
-            researchContainer.innerHTML = research
+            researchContainer.innerHTML = sortItems(research)
                 .filter(r => r && r.title)
                 .map(r => `
                 <div class="research-item" onclick="window.open('${r.link}', '_blank')">
                     <div class="research-icon"><i class="${r.icon || 'fas fa-file-alt'}"></i></div>
                     <div class="research-details">
                         <h3 class="research-title">${r.title || 'Untitled Research'}</h3>
-                        <p>${r.description || 'No description available.'}</p>
-                        <span class="research-tag">${r.tag || ''}</span>
+                        ${r.description ? `<p>${r.description}</p>` : ''}
+                        <span class="research-tag">${formatDate(r.tag)}</span>
                     </div>
                 </div>
             `).join('');
         }
 
         if (importantContainer) {
-            importantContainer.innerHTML = (important || [])
+            importantContainer.innerHTML = sortItems(important || [])
                 .filter(i => i && i.title)
                 .map(i => {
                     const hasLink = i.link && i.link !== '#' && i.link.trim() !== '';
@@ -147,8 +173,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="research-icon"><i class="${i.icon || 'fas fa-exclamation-circle'}"></i></div>
                         <div class="research-details">
                             <h3 class="research-title">${i.title || 'Untitled Update'}</h3>
-                            <p>${i.description || 'No description available.'}</p>
-                            <span class="research-tag">${i.tag || ''}</span>
+                            ${i.description ? `<p>${i.description}</p>` : ''}
+                            <span class="research-tag">${formatDate(i.tag)}</span>
                         </div>
                     </div>
                 `;
