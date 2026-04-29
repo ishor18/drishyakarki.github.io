@@ -423,8 +423,8 @@ ul {
     margin-bottom: 0.5rem;
 }
 
-/* Research Section */
-.research-list {
+/* Research & Important Sections */
+.research-list, .important-list {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
@@ -449,6 +449,15 @@ ul {
 .research-item:hover {
     border-color: var(--primary-color);
     transform: translateX(10px);
+}
+
+.research-item.no-link {
+    cursor: default;
+}
+
+.research-item.no-link:hover {
+    transform: none;
+    border-color: var(--glass-border);
 }
 
 .research-icon {

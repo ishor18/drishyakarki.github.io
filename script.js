@@ -46,6 +46,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ];
 
+    const initialImportant = [
+        {
+            id: 1,
+            title: "Accepted into KAUST",
+            description: "Started working as a Research Engineer at King Abdullah University of Science and Technology.",
+            tag: "Career",
+            link: "#",
+            icon: "fas fa-briefcase"
+        },
+        {
+            id: 2,
+            title: "CVPR 2025 Submission",
+            description: "Submitted our research on 'Pixels or Positions? Benchmarking Modalities in Group Activity Recognition'.",
+            tag: "Research",
+            link: "https://arxiv.org/abs/2511.12606",
+            icon: "fas fa-book-open"
+        }
+    ];
+
     // Initialize LocalStorage if empty or outdated
     const storedProjects = localStorage.getItem('projects');
     const storedResearch = localStorage.getItem('research');
@@ -65,14 +84,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!storedResearch || forceReset) {
         localStorage.setItem('research', JSON.stringify(initialResearch));
     }
+    
+    const storedImportant = localStorage.getItem('important');
+    if (!storedImportant || forceReset) {
+        localStorage.setItem('important', JSON.stringify(initialImportant));
+    }
 
     // --- Dynamic Rendering ---
     const renderContent = () => {
         const projects = JSON.parse(localStorage.getItem('projects'));
         const research = JSON.parse(localStorage.getItem('research'));
+        const important = JSON.parse(localStorage.getItem('important'));
 
         const projectsContainer = document.getElementById('projectsContainer');
         const researchContainer = document.getElementById('researchContainer');
+        const importantContainer = document.getElementById('importantContainer');
 
         if (projectsContainer) {
             projectsContainer.innerHTML = projects
@@ -109,6 +135,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             `).join('');
+        }
+
+        if (importantContainer) {
+            importantContainer.innerHTML = (important || [])
+                .filter(i => i && i.title)
+                .map(i => {
+                    const hasLink = i.link && i.link !== '#' && i.link.trim() !== '';
+                    return `
+                    <div class="research-item ${!hasLink ? 'no-link' : ''}" ${hasLink ? `onclick="window.open('${i.link}', '_blank')"` : ''}>
+                        <div class="research-icon"><i class="${i.icon || 'fas fa-exclamation-circle'}"></i></div>
+                        <div class="research-details">
+                            <h3 class="research-title">${i.title || 'Untitled Update'}</h3>
+                            <p>${i.description || 'No description available.'}</p>
+                            <span class="research-tag">${i.tag || ''}</span>
+                        </div>
+                    </div>
+                `;
+                }).join('');
         }
 
         // Re-observe new elements for animations
