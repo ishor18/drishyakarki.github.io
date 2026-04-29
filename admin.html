@@ -503,7 +503,7 @@
 </head>
 
 <body>
-    <div class="admin-container" id="adminContainer">
+    <div class="auth-wrapper" id="authWrapper" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem;">
         <!-- Login Form -->
         <div id="loginCard" class="login-card">
             <h2>Admin Access</h2>
@@ -579,7 +579,9 @@
                 <i class="fas fa-arrow-left"></i> Back to Website
             </a>
         </div>
+    </div>
 
+    <div class="admin-container" id="adminContainer" style="display: none;">
         <!-- Sidebar (Visible when logged in) -->
         <aside class="sidebar" id="sidebar">
             <div style="margin-bottom: 2rem; padding: 0.5rem;">
@@ -599,14 +601,14 @@
                 <a href="index.html" class="nav-btn" style="text-decoration: none;">
                     <i class="fas fa-external-link-alt"></i> View Site
                 </a>
-                <button class="nav-btn" onclick="logout()" style="color: #ef4444; width: 100%;">
+                <button class="nav-btn" onclick="logout()" style="color: #ef4444; width: 100%; text-align: left;">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
             </div>
         </aside>
 
-        <!-- Main Dashboard Content -->
-        <main class="dashboard-content" id="dashboardContent">
+        <!-- Main Content Area -->
+        <main class="main-content" id="dashboardContent">
             <!-- Overview Tab -->
             <section id="overviewSection">
                 <div class="stats-grid">
@@ -706,33 +708,40 @@
                 </div>
             </section>
 
-            <!-- Data & Backup Tab -->
-            <section id="dataSection" style="display: none;">
-                <div class="dashboard-card">
-                    <h3>Data Management</h3>
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;">
-                        Keep your portfolio backup safe. You can export all your projects and research papers as a
-                        single JSON file and restore them later.
-                    </p>
-                    <div class="data-management" style="flex-wrap: wrap;">
-                        <button class="btn btn-outline" onclick="migrateToSupabase()" style="border-color: var(--primary-color); color: var(--primary-color);">
-                            <i class="fas fa-sync"></i> Sync Local to Supabase
+                <!-- Data & Backup Tab -->
+                <section id="dataSection" style="display: none;">
+                    <div class="dashboard-card">
+                        <h3>Database Synchronization</h3>
+                        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Migrate your existing local data to
+                            Supabase Cloud.</p>
+                        <button onclick="migrateToSupabase()" class="btn btn-primary">
+                            <i class="fas fa-sync-alt"></i> Sync Local to Supabase
                         </button>
-                        <button class="btn btn-primary" onclick="exportData()">
-                            <i class="fas fa-download"></i> Export JSON Backup
-                        </button>
-                        <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">
-                            <i class="fas fa-upload"></i> Import Backup
-                        </button>
-                        <button class="btn btn-outline" style="border-color: #f59e0b; color: #f59e0b;"
-                            onclick="restoreDefaults()">
-                            <i class="fas fa-undo"></i> Restore Initial Data
-                        </button>
-                        <input type="file" id="importFile" style="display: none;" accept=".json"
-                            onchange="importData(event)">
                     </div>
-                </div>
-            </section>
+
+                    <div class="dashboard-card" style="margin-top: 2rem;">
+                        <h3>Local Backup Management</h3>
+                        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                            <button onclick="exportData()" class="btn btn-outline">
+                                <i class="fas fa-download"></i> Export Data (JSON)
+                            </button>
+                            <label class="btn btn-outline" style="cursor: pointer;">
+                                <i class="fas fa-upload"></i> Import Data (JSON)
+                                <input type="file" id="importFile" hidden onchange="importData(event)">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card" style="margin-top: 2rem; border: 1px solid rgba(239, 68, 68, 0.2);">
+                        <h3 style="color: #ef4444;">Danger Zone</h3>
+                        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Resetting will clear all database
+                            entries. Use with caution.</p>
+                        <button onclick="document.getElementById('restoreModal').style.display='flex'" class="btn"
+                            style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                            <i class="fas fa-trash-alt"></i> Reset All Data
+                        </button>
+                    </div>
+                </section>
         </main>
     </div>
 
@@ -807,7 +816,11 @@
                 <button id="confirmRestoreBtn" class="btn" style="background: #f59e0b; color: white;">Restore
                     Now</button>
                 <button class="btn btn-outline" onclick="closeRestoreModal()">Cancel</button>
-            </div>    <script>
+            </div>
+        </div>
+    </div>
+
+    <script>
         // --- Supabase Config ---
         const SUPABASE_URL = 'https://eqijufahytbwxnxszlzf.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxaWp1ZmFoeXRid3hueHN6bHpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzE0MTcsImV4cCI6MjA5MzA0NzQxN30.fuHslML7flu4Rs9TfpyGvtdFrLM0DoXoH62KE_d5Xj8';
@@ -891,10 +904,12 @@
         });
 
         const showDashboard = () => {
+            const authWrapper = document.getElementById('authWrapper');
+            if (authWrapper) authWrapper.style.display = 'none';
             if (!adminContainer || !loginCard || !signupCard) return;
             loginCard.style.display = 'none';
             signupCard.style.display = 'none';
-            adminContainer.style.display = ''; // Allow CSS to handle display (grid/block)
+            adminContainer.style.display = 'grid'; // Force grid for layout
             adminContainer.classList.add('logged-in');
             updateStats();
             renderItems();
