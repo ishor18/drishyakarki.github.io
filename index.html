@@ -17,6 +17,8 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -118,7 +120,10 @@
                 <div class="section-line"></div>
             </div>
             <div class="important-list" id="importantContainer">
-                <!-- Important updates will be injected here -->
+                <!-- Recent Updates will be injected here -->
+            </div>
+            <div id="loadMoreContainer" class="load-more-container" style="display: none;">
+                <button id="btnLoadMore" class="btn-load-more">Load More Updates</button>
             </div>
         </div>
     </section>
@@ -133,6 +138,9 @@
             <div class="research-list" id="researchContainer">
                 <!-- Research items will be injected here -->
             </div>
+            <div id="loadMoreResearchContainer" class="load-more-container" style="display: none;">
+                <button id="btnLoadMoreResearch" class="btn-load-more">Load More Research</button>
+            </div>
         </div>
     </section>
 
@@ -146,6 +154,9 @@
             <div class="project-grid" id="projectsContainer">
                 <!-- Project cards will be injected here -->
             </div>
+            <div id="loadMoreProjectsContainer" class="load-more-container" style="display: none;">
+                <button id="btnLoadMoreProjects" class="btn-load-more">Load More Projects</button>
+            </div>
         </div>
     </section>
 
@@ -156,42 +167,11 @@
                 <h2 class="section-title">Technical Expertise</h2>
                 <div class="section-line"></div>
             </div>
-            <div class="skills-container">
-                <div class="skill-category">
-                    <h3>Deep Learning & AI</h3>
-                    <div class="skill-tags">
-                        <span>PyTorch</span>
-                        <span>Scikit-learn</span>
-                        <span>NumPy</span>
-                        <span>Pandas</span>
-                        <span>HuggingFace</span>
-                        <span>OpenCV</span>
-                        <span>NLP</span>
-                        <span>Computer Vision</span>
-                    </div>
-                </div>
-                <div class="skill-category">
-                    <h3>Programming</h3>
-                    <div class="skill-tags">
-                        <span>Python</span>
-                        <span>C++</span>
-                        <span>JavaScript</span>
-                        <span>TypeScript</span>
-                        <span>Dart</span>
-                    </div>
-                </div>
-                <div class="skill-category">
-                    <h3>Frameworks & Tools</h3>
-                    <div class="skill-tags">
-                        <span>React</span>
-                        <span>Flutter</span>
-                        <span>Flask</span>
-                        <span>FastAPI</span>
-                        <span>Linux</span>
-                        <span>Git</span>
-                        <span>Docker</span>
-                    </div>
-                </div>
+            <div class="skills-container" id="skillsContainer">
+                <!-- Skills will be injected here by script.js -->
+            </div>
+            <div id="loadMoreSkillsContainer" class="load-more-container" style="display: none;">
+                <button id="btnLoadMoreSkills" class="btn-load-more">Load More Expertise</button>
             </div>
         </div>
     </section>

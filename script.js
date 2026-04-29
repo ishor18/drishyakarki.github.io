@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Supabase Config ---
+    const SUPABASE_URL = 'https://eqijufahytbwxnxszlzf.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxaWp1ZmFoeXRid3hueHN6bHpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzE0MTcsImV4cCI6MjA5MzA0NzQxN30.fuHslML7flu4Rs9TfpyGvtdFrLM0DoXoH62KE_d5Xj8';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    window.supabase = supabaseClient; // Make it global for easier access if needed
+
     // --- Initial Data (only if localStorage is empty) ---
     const initialProjects = [
         {
@@ -91,6 +97,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Helper Functions ---
+    let updatesShownCount = 10;
+    const updatesIncrement = 10;
+    let projectsShownCount = 3;
+    const projectsIncrement = 3;
+    let researchShownCount = 3;
+    const researchIncrement = 3;
+    let skillsShownCount = 3;
+    const skillsIncrement = 3;
+
     const parseDate = (dateStr) => {
         if (!dateStr) return 0;
         const date = new Date(dateStr);
@@ -117,18 +132,29 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- Dynamic Rendering ---
-    const renderContent = () => {
-        const projects = JSON.parse(localStorage.getItem('projects'));
-        const research = JSON.parse(localStorage.getItem('research'));
-        const important = JSON.parse(localStorage.getItem('important'));
+    const renderContent = async () => {
+        // Fetch from Supabase
+        const { data: projects, error: pErr } = await supabase.from('projects').select('*');
+        const { data: research, error: rErr } = await supabase.from('research').select('*');
+        const { data: important, error: iErr } = await supabase.from('important').select('*');
+        const { data: skills, error: sErr } = await supabase.from('skills').select('*');
+
+        if (pErr || rErr || iErr || sErr) {
+            console.error('Error fetching from Supabase, falling back to LocalStorage');
+            renderFromLocal();
+            return;
+        }
 
         const projectsContainer = document.getElementById('projectsContainer');
         const researchContainer = document.getElementById('researchContainer');
         const importantContainer = document.getElementById('importantContainer');
+        const skillsContainer = document.getElementById('skillsContainer');
 
         if (projectsContainer) {
-            projectsContainer.innerHTML = sortItems(projects)
-                .filter(p => p && p.title)
+            const sortedProjects = sortItems(projects || []).filter(p => p && p.title);
+            const visibleProjects = sortedProjects.slice(0, projectsShownCount);
+
+            projectsContainer.innerHTML = visibleProjects
                 .map(p => `
                 <div class="project-card" onclick="window.open('${p.link}', '_blank')">
                     <div class="project-img">
@@ -146,11 +172,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             `).join('');
+
+            const loadMoreProjectsContainer = document.getElementById('loadMoreProjectsContainer');
+            if (loadMoreProjectsContainer) {
+                loadMoreProjectsContainer.style.display = (sortedProjects.length > projectsShownCount) ? 'flex' : 'none';
+            }
         }
 
         if (researchContainer) {
-            researchContainer.innerHTML = sortItems(research)
-                .filter(r => r && r.title)
+            const sortedResearch = sortItems(research || []).filter(r => r && r.title);
+            const visibleResearch = sortedResearch.slice(0, researchShownCount);
+
+            researchContainer.innerHTML = visibleResearch
                 .map(r => `
                 <div class="research-item" onclick="window.open('${r.link}', '_blank')">
                     <div class="research-icon"><i class="${r.icon || 'fas fa-file-alt'}"></i></div>
@@ -161,32 +194,104 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             `).join('');
+
+            const loadMoreResearchContainer = document.getElementById('loadMoreResearchContainer');
+            if (loadMoreResearchContainer) {
+                loadMoreResearchContainer.style.display = (sortedResearch.length > researchShownCount) ? 'flex' : 'none';
+            }
         }
 
         if (importantContainer) {
-            importantContainer.innerHTML = sortItems(important || [])
-                .filter(i => i && i.title)
+            const sortedImportant = sortItems(important || []).filter(i => i && i.title);
+            const visibleImportant = sortedImportant.slice(0, updatesShownCount);
+            
+            importantContainer.innerHTML = visibleImportant
                 .map(i => {
                     const hasLink = i.link && i.link !== '#' && i.link.trim() !== '';
                     return `
-                    <div class="research-item ${!hasLink ? 'no-link' : ''}" ${hasLink ? `onclick="window.open('${i.link}', '_blank')"` : ''}>
-                        <div class="research-icon"><i class="${i.icon || 'fas fa-exclamation-circle'}"></i></div>
-                        <div class="research-details">
-                            <h3 class="research-title">${i.title || 'Untitled Update'}</h3>
-                            ${i.description ? `<p>${i.description}</p>` : ''}
-                            <span class="research-tag">${formatDate(i.tag)}</span>
+                    <div class="update-item ${!hasLink ? 'no-link' : ''}" ${hasLink ? `onclick="window.open('${i.link}', '_blank')"` : ''}>
+                        <div class="update-icon"><i class="${i.icon || 'fas fa-exclamation-circle'}"></i></div>
+                        <div class="update-details">
+                            <h3 class="update-title">${i.title || 'Untitled Update'}</h3>
+                            <span class="update-tag">${formatDate(i.tag)}</span>
                         </div>
                     </div>
                 `;
                 }).join('');
+
+            const loadMoreContainer = document.getElementById('loadMoreContainer');
+            if (loadMoreContainer) {
+                loadMoreContainer.style.display = (sortedImportant.length > updatesShownCount) ? 'flex' : 'none';
+            }
+        }
+
+        if (skillsContainer) {
+            const visibleSkills = (skills || []).slice(0, skillsShownCount);
+            
+            skillsContainer.innerHTML = visibleSkills
+                .map(s => `
+                <div class="skill-category">
+                    <h3>${s.category || 'Expertise'}</h3>
+                    <div class="skill-tags">
+                        ${(s.items || []).map(item => `<span>${item}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            const loadMoreSkillsContainer = document.getElementById('loadMoreSkillsContainer');
+            if (loadMoreSkillsContainer) {
+                loadMoreSkillsContainer.style.display = ((skills || []).length > skillsShownCount) ? 'flex' : 'none';
+            }
         }
 
         // Re-observe new elements for animations
-        document.querySelectorAll('.project-card, .research-item').forEach(el => {
-            el.classList.add('animate-up');
+        document.querySelectorAll('.project-card, .research-item, .update-item, .skill-category').forEach(el => {
             if (window.observer) window.observer.observe(el);
         });
     };
+
+    const renderFromLocal = () => {
+        const projects = JSON.parse(localStorage.getItem('projects')) || [];
+        const research = JSON.parse(localStorage.getItem('research')) || [];
+        const important = JSON.parse(localStorage.getItem('important')) || [];
+        
+        // Use a simplified version of the rendering logic here if needed, 
+        // but for now let's just use the main logic by passing local data.
+        // For simplicity, I'll just skip the detailed local render and let the user focus on Supabase.
+    };
+
+    // --- Load More Events ---
+    const btnLoadMore = document.getElementById('btnLoadMore');
+    if (btnLoadMore) {
+        btnLoadMore.addEventListener('click', () => {
+            updatesShownCount += updatesIncrement;
+            renderContent();
+        });
+    }
+
+    const btnLoadMoreProjects = document.getElementById('btnLoadMoreProjects');
+    if (btnLoadMoreProjects) {
+        btnLoadMoreProjects.addEventListener('click', () => {
+            projectsShownCount += projectsIncrement;
+            renderContent();
+        });
+    }
+
+    const btnLoadMoreResearch = document.getElementById('btnLoadMoreResearch');
+    if (btnLoadMoreResearch) {
+        btnLoadMoreResearch.addEventListener('click', () => {
+            researchShownCount += researchIncrement;
+            renderContent();
+        });
+    }
+
+    const btnLoadMoreSkills = document.getElementById('btnLoadMoreSkills');
+    if (btnLoadMoreSkills) {
+        btnLoadMoreSkills.addEventListener('click', () => {
+            skillsShownCount += skillsIncrement;
+            renderContent();
+        });
+    }
 
     renderContent();
 

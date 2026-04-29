@@ -7,6 +7,8 @@
     <title>Admin Dashboard | Drishya Karki</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -624,9 +626,14 @@
                         <p id="statImportant">0</p>
                     </div>
                     <div class="stat-card">
+                        <i class="fas fa-tools"></i>
+                        <h3>Total Expertise</h3>
+                        <p id="statSkills">0</p>
+                    </div>
+                    <div class="stat-card">
                         <i class="fas fa-user-shield"></i>
                         <h3>Admin Status</h3>
-                        <p style="font-size: 1.2rem; color: var(--primary-color);">Verified</p>
+                        <p style="font-size: 1.2rem; color: var(--primary-color); margin:0;">Verified</p>
                     </div>
                 </div>
 
@@ -649,8 +656,8 @@
                                 Projects</div>
                             <div class="tab" id="tabResearch" onclick="switchContentType(event, 'research')">Research
                             </div>
-                            <div class="tab" id="tabImportant" onclick="switchContentType(event, 'important')">Recent Updates
-                            </div>
+                            <div class="tab" id="tabImportant" onclick="switchContentType(event, 'important')">Recent Updates</div>
+                            <div class="tab" id="tabSkills" onclick="switchContentType(event, 'skills')">Expertise</div>
                         </div>
                     </div>
 
@@ -708,6 +715,9 @@
                         single JSON file and restore them later.
                     </p>
                     <div class="data-management" style="flex-wrap: wrap;">
+                        <button class="btn btn-outline" onclick="migrateToSupabase()" style="border-color: var(--primary-color); color: var(--primary-color);">
+                            <i class="fas fa-sync"></i> Sync Local to Supabase
+                        </button>
                         <button class="btn btn-primary" onclick="exportData()">
                             <i class="fas fa-download"></i> Export JSON Backup
                         </button>
@@ -797,11 +807,12 @@
                 <button id="confirmRestoreBtn" class="btn" style="background: #f59e0b; color: white;">Restore
                     Now</button>
                 <button class="btn btn-outline" onclick="closeRestoreModal()">Cancel</button>
-            </div>
-        </div>
-    </div>
+            </div>    <script>
+        // --- Supabase Config ---
+        const SUPABASE_URL = 'https://eqijufahytbwxnxszlzf.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxaWp1ZmFoeXRid3hueHN6bHpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzE0MTcsImV4cCI6MjA5MzA0NzQxN30.fuHslML7flu4Rs9TfpyGvtdFrLM0DoXoH62KE_d5Xj8';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    <script>
         const ADMIN_EMAIL = "karkidrishya1@gmail.com";
         const ADMIN_PASS = "Drishya@123";
         const SECRET_KEY = "DRISHYA_ADMIN_2026";
@@ -873,98 +884,160 @@
             toggleAuth('login');
         });
 
+        document.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('isAdmin') === 'true') {
+                showDashboard();
+            }
+        });
+
         const showDashboard = () => {
+            if (!adminContainer || !loginCard || !signupCard) return;
             loginCard.style.display = 'none';
             signupCard.style.display = 'none';
+            adminContainer.style.display = ''; // Allow CSS to handle display (grid/block)
             adminContainer.classList.add('logged-in');
             updateStats();
             renderItems();
         };
 
-        const logout = () => {
+        const migrateToSupabase = async () => {
+            if (!confirm('This will copy all your local data to Supabase. Continue?')) return;
+            
+            const types = ['projects', 'research', 'important'];
+            for (const type of types) {
+                const localData = JSON.parse(localStorage.getItem(type)) || [];
+                if (localData.length > 0) {
+                    const dataToUpload = localData.map(({id, ...rest}) => rest);
+                    const { error } = await supabaseClient.from(type).insert(dataToUpload);
+                    if (error) {
+                        console.error(`Error migrating ${type}:`, error);
+                        alert(`Failed to migrate ${type}. Check console.`);
+                    }
+                }
+            }
+            alert('Migration complete! Your data is now in Supabase.');
+            updateStats();
+            renderItems();
+        };
+
+        window.logout = () => {
             sessionStorage.removeItem('isAdmin');
             location.reload();
         };
 
-        if (sessionStorage.getItem('isAdmin') === 'true') {
-            showDashboard();
-        }
-
-        // Main Tab Switching (Overview, Content, Data)
+        // Main Tab Switching
         window.switchMainTab = (tab) => {
             document.querySelectorAll('main section').forEach(s => s.style.display = 'none');
-            document.getElementById(tab + 'Section').style.display = 'block';
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.querySelector(`[onclick="switchMainTab('${tab}')"]`).classList.add('active');
+            const section = document.getElementById(tab + 'Section');
+            if (section) section.style.display = 'block';
+            
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                b.classList.remove('active');
+                if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${tab}'`)) {
+                    b.classList.add('active');
+                }
+            });
+            
             if (tab === 'overview') updateStats();
         };
 
-        // Content Sub-Tab Switching (Projects vs Research)
+        // Content Sub-Tab Switching
         window.switchContentType = (event, type) => {
             document.getElementById('itemType').value = type;
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
 
-            document.getElementById('tagsGroup').style.display = type === 'projects' ? 'block' : 'none';
+            document.getElementById('tagsGroup').style.display = (type === 'projects' || type === 'skills') ? 'block' : 'none';
             document.getElementById('tagGroup').style.display = (type === 'research' || type === 'important') ? 'block' : 'none';
+            
+            const tagsLabel = document.querySelector('#tagsGroup label');
+            if (type === 'skills') {
+                tagsLabel.textContent = 'Skills (Comma separated)';
+                document.getElementById('itemTags').placeholder = 'Python, C++, Java';
+                document.getElementById('descTitle').textContent = 'Category Name';
+                document.getElementById('itemDesc').placeholder = 'E.g. Programming Languages';
+                document.getElementById('itemTitle').placeholder = 'Internal Title (optional)';
+                document.getElementById('itemTitle').required = false;
+            } else {
+                tagsLabel.textContent = 'Tags (Comma separated)';
+                document.getElementById('itemTags').placeholder = 'HTML, CSS, JS';
+                document.getElementById('descTitle').textContent = type === 'important' ? 'Description (Optional)' : 'Description';
+                document.getElementById('itemDesc').placeholder = 'Tell us more about this work...';
+                document.getElementById('itemTitle').placeholder = 'E.g. Portfolio Website';
+                document.getElementById('itemTitle').required = true;
+            }
+
             document.getElementById('tagLabel').textContent = type === 'important' ? 'Select Date' : 'Date/Tag';
             document.getElementById('itemTag').type = (type === 'important' || type === 'research') ? 'date' : 'text';
-            document.getElementById('linkTitle').textContent = type === 'important' ? 'Link (Optional)' : 'Link (URL)';
-            document.getElementById('itemLink').required = type !== 'important';
+            document.getElementById('linkTitle').textContent = (type === 'important' || type === 'skills') ? 'Link (Optional)' : 'Link (URL)';
+            document.getElementById('itemLink').required = (type !== 'important' && type !== 'skills');
             document.getElementById('itemDesc').required = type !== 'important';
-            document.getElementById('descTitle').textContent = type === 'important' ? 'Description (Optional)' : 'Description';
-            const displayType = type === 'important' ? 'Recent Updates' : type.charAt(0).toUpperCase() + type.slice(1);
+            
+            const displayType = type === 'important' ? 'Recent Updates' : (type === 'skills' ? 'Technical Expertise' : type.charAt(0).toUpperCase() + type.slice(1));
             document.getElementById('currentListTitle').textContent = `Current ${displayType}`;
             renderItems();
         };
 
         // Stats Update
-        const updateStats = () => {
-            document.getElementById('statProjects').textContent = (JSON.parse(localStorage.getItem('projects')) || []).length;
-            document.getElementById('statResearch').textContent = (JSON.parse(localStorage.getItem('research')) || []).length;
-            document.getElementById('statImportant').textContent = (JSON.parse(localStorage.getItem('important')) || []).length;
+        const updateStats = async () => {
+            const { count: pCount } = await supabaseClient.from('projects').select('*', { count: 'exact', head: true });
+            const { count: rCount } = await supabaseClient.from('research').select('*', { count: 'exact', head: true });
+            const { count: iCount } = await supabaseClient.from('important').select('*', { count: 'exact', head: true });
+            const { count: sCount } = await supabaseClient.from('skills').select('*', { count: 'exact', head: true });
+
+            document.getElementById('statProjects').textContent = pCount || 0;
+            document.getElementById('statResearch').textContent = rCount || 0;
+            document.getElementById('statImportant').textContent = iCount || 0;
+            document.getElementById('statSkills').textContent = sCount || 0;
         };
 
         // Add Item
-        addForm.addEventListener('submit', (e) => {
+        addForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const type = document.getElementById('itemType').value;
-            const items = JSON.parse(localStorage.getItem(type)) || [];
-
-            const newItem = {
-                id: Date.now(),
-                title: document.getElementById('itemTitle').value,
+            let newItem = {
+                title: document.getElementById('itemTitle').value || document.getElementById('itemDesc').value,
                 description: document.getElementById('itemDesc').value,
                 link: document.getElementById('itemLink').value,
                 icon: document.getElementById('itemIcon').value
             };
 
-            if (type === 'projects') newItem.tags = document.getElementById('itemTags').value.split(',').map(t => t.trim());
-            else newItem.tag = document.getElementById('itemTag').value;
+            if (type === 'projects') {
+                newItem.tags = document.getElementById('itemTags').value.split(',').map(t => t.trim()).filter(t => t);
+            } else if (type === 'skills') {
+                newItem = {
+                    category: document.getElementById('itemDesc').value,
+                    items: document.getElementById('itemTags').value.split(',').map(t => t.trim()).filter(t => t),
+                    icon: document.getElementById('itemIcon').value
+                };
+            } else {
+                newItem.tag = document.getElementById('itemTag').value;
+            }
 
-            items.unshift(newItem);
-            localStorage.setItem(type, JSON.stringify(items));
-            addForm.reset();
-            renderItems();
-            updateStats();
-            const logType = type === 'important' ? 'recent update' : type.slice(0, -1);
-            logActivity(`Added new ${logType}: ${newItem.title}`);
+            const { error } = await supabaseClient.from(type).insert([newItem]);
+            if (error) {
+                alert('Error: ' + error.message);
+            } else {
+                addForm.reset();
+                renderItems();
+                updateStats();
+                logActivity(`Added new ${type}: ${newItem.title || newItem.category}`);
+            }
         });
 
         // Activity Logger
         const logActivity = (msg) => {
             const log = document.getElementById('activityLog');
-            if (log.innerText.includes('Waiting')) log.innerHTML = '';
+            if (log && log.innerText.includes('Waiting')) log.innerHTML = '';
             const entry = document.createElement('div');
             entry.style.padding = '0.5rem 0';
             entry.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
             entry.innerHTML = `<span style="color:var(--primary-color)">[${new Date().toLocaleTimeString()}]</span> ${msg}`;
-            log.prepend(entry);
+            if (log) log.prepend(entry);
         };
 
-        // Delete Modal Logic
+        // Delete Logic
         let pendingDelete = null;
-
         window.deleteItem = (type, id) => {
             pendingDelete = { type, id };
             document.getElementById('deleteModal').style.display = 'flex';
@@ -975,57 +1048,46 @@
             pendingDelete = null;
         };
 
-        document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
             if (!pendingDelete) return;
             const { type, id } = pendingDelete;
-
-            let items = JSON.parse(localStorage.getItem(type)) || [];
-            const item = items.find(i => Number(i.id) === Number(id));
-
-            if (item) {
-                items = items.filter(i => Number(i.id) !== Number(id));
-                localStorage.setItem(type, JSON.stringify(items));
+            const { error } = await supabaseClient.from(type).delete().eq('id', id);
+            
+            if (error) {
+                alert('Error: ' + error.message);
+            } else {
                 renderItems();
                 updateStats();
-                const logType = type === 'important' ? 'recent update' : type.slice(0, -1);
-                logActivity(`Deleted ${logType}: ${item.title}`);
+                logActivity(`Deleted ${type} item`);
             }
-
             closeDeleteModal();
         });
 
-        // Edit Modal Logic
-        window.openEditModal = (type, id) => {
-            const items = JSON.parse(localStorage.getItem(type)) || [];
-            const item = items.find(i => i.id === id);
-            if (!item) return;
+        // Edit Logic
+        window.openEditModal = async (type, id) => {
+            const { data: item, error } = await supabaseClient.from(type).select('*').eq('id', id).single();
+            if (error) return alert('Error fetching item');
 
             document.getElementById('editId').value = id;
             document.getElementById('editType').value = type;
-            document.getElementById('editTitle').value = item.title;
-            document.getElementById('editDesc').value = item.description;
-            document.getElementById('editLink').value = item.link;
+            document.getElementById('editTitle').value = item.title || item.category || '';
+            document.getElementById('editDesc').value = item.description || item.category || '';
+            document.getElementById('editLink').value = item.link || '';
             document.getElementById('editIcon').value = item.icon || 'fas fa-code';
 
             const tagsGroup = document.getElementById('editTagsGroup');
             const tagGroup = document.getElementById('editTagGroup');
 
-            if (type === 'projects') {
+            if (type === 'projects' || type === 'skills') {
                 tagsGroup.style.display = 'block';
                 tagGroup.style.display = 'none';
-                document.getElementById('editTags').value = (item.tags || []).join(', ');
+                document.getElementById('editTags').value = (item.tags || item.items || []).join(', ');
             } else {
                 tagsGroup.style.display = 'none';
                 tagGroup.style.display = 'block';
                 document.getElementById('editTag').value = item.tag || '';
             }
 
-            document.getElementById('editLink').required = type !== 'important';
-            document.getElementById('editTagLabel').textContent = type === 'important' ? 'Select Date' : 'Date/Tag';
-            document.getElementById('editTag').type = (type === 'important' || type === 'research') ? 'date' : 'text';
-            document.getElementById('editLinkTitle').textContent = type === 'important' ? 'Link (Optional)' : 'Link (URL)';
-            document.getElementById('editDesc').required = type !== 'important';
-            document.getElementById('editDescTitle').textContent = type === 'important' ? 'Description (Optional)' : 'Description';
             document.getElementById('editModal').style.display = 'flex';
         };
 
@@ -1033,34 +1095,45 @@
             document.getElementById('editModal').style.display = 'none';
         };
 
-        editForm.addEventListener('submit', (e) => {
+        editForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const id = parseInt(document.getElementById('editId').value);
+            const id = document.getElementById('editId').value;
             const type = document.getElementById('editType').value;
-            let items = JSON.parse(localStorage.getItem(type)) || [];
-            const index = items.findIndex(i => i.id === id);
+            
+            let updatedItem = {
+                title: document.getElementById('editTitle').value,
+                description: document.getElementById('editDesc').value,
+                link: document.getElementById('editLink').value,
+                icon: document.getElementById('editIcon').value
+            };
 
-            if (index !== -1) {
-                items[index].title = document.getElementById('editTitle').value;
-                items[index].description = document.getElementById('editDesc').value;
-                items[index].link = document.getElementById('editLink').value;
-                items[index].icon = document.getElementById('editIcon').value;
+            if (type === 'projects') {
+                updatedItem.tags = document.getElementById('editTags').value.split(',').map(t => t.trim()).filter(t => t);
+            } else if (type === 'skills') {
+                updatedItem = {
+                    category: document.getElementById('editDesc').value,
+                    items: document.getElementById('editTags').value.split(',').map(t => t.trim()).filter(t => t),
+                    icon: document.getElementById('editIcon').value
+                };
+            } else {
+                updatedItem.tag = document.getElementById('editTag').value;
+            }
 
-                if (type === 'projects') items[index].tags = document.getElementById('editTags').value.split(',').map(t => t.trim());
-                else items[index].tag = document.getElementById('editTag').value;
-
-                localStorage.setItem(type, JSON.stringify(items));
+            const { error } = await supabaseClient.from(type).update(updatedItem).eq('id', id);
+            if (error) {
+                alert('Error updating: ' + error.message);
+            } else {
                 renderItems();
                 closeEditModal();
-                const logType = type === 'important' ? 'recent update' : type.slice(0, -1);
-                logActivity(`Updated ${logType}: ${items[index].title}`);
+                logActivity(`Updated ${type}: ${updatedItem.title || updatedItem.category}`);
             }
         });
 
         // Render Items
-        const renderItems = () => {
+        const renderItems = async () => {
             const type = document.getElementById('itemType').value;
-            let items = JSON.parse(localStorage.getItem(type)) || [];
+            const { data: items, error } = await supabaseClient.from(type).select('*');
+            if (error) return console.error('Error rendering:', error);
 
             const parseDate = (dateStr) => {
                 if (!dateStr) return 0;
@@ -1068,12 +1141,14 @@
                 return isNaN(date.getTime()) ? 0 : date.getTime();
             };
 
-            items.sort((a, b) => {
-                const dateA = parseDate(a.tag || (a.tags ? a.tags[0] : ''));
-                const dateB = parseDate(b.tag || (b.tags ? b.tags[0] : ''));
-                if (dateB === dateA) return b.id - a.id;
-                return dateB - dateA;
-            });
+            if (type !== 'skills') {
+                items.sort((a, b) => {
+                    const dateA = parseDate(a.tag || (a.tags ? a.tags[0] : ''));
+                    const dateB = parseDate(b.tag || (b.tags ? b.tags[0] : ''));
+                    if (dateB === dateA) return b.id - a.id;
+                    return dateB - dateA;
+                });
+            }
 
             if (items.length === 0) {
                 itemsList.innerHTML = `<div style="text-align:center; padding: 2rem; color:var(--text-muted);">No ${type} found.</div>`;
@@ -1091,9 +1166,9 @@
                 <div class="item-card">
                     <div class="item-icon"><i class="${i.icon || 'fas fa-code'}"></i></div>
                     <div class="item-details">
-                        <h4>${i.title}</h4>
+                        <h4>${i.title || i.category}</h4>
                         <p style="font-size: 0.8rem; color: var(--primary-color); margin-bottom: 0.2rem;">${formatDate(i.tag || (i.tags ? i.tags[0] : ''))}</p>
-                        <p>${i.description || ''}</p>
+                        <p>${type === 'skills' ? (i.items || []).join(', ') : (i.description || '')}</p>
                     </div>
                     <div class="action-btns">
                         <button class="btn-icon btn-edit" title="Edit" onclick="openEditModal('${type}', ${i.id})">
@@ -1120,13 +1195,11 @@
             a.href = url;
             a.download = `portfolio_backup_${new Date().toISOString().split('T')[0]}.json`;
             a.click();
-            logActivity('Exported full database backup');
         };
 
         window.importData = (event) => {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = (e) => {
                 try {
@@ -1134,7 +1207,7 @@
                     if (data.projects) localStorage.setItem('projects', JSON.stringify(data.projects));
                     if (data.research) localStorage.setItem('research', JSON.stringify(data.research));
                     if (data.important) localStorage.setItem('important', JSON.stringify(data.important));
-                    alert('Data imported successfully!');
+                    alert('Data imported to local storage. Use "Sync" to upload to Supabase.');
                     location.reload();
                 } catch (err) {
                     alert('Error: Invalid JSON file');
@@ -1142,80 +1215,6 @@
             };
             reader.readAsText(file);
         };
-
-        // Restore Modal Logic
-        window.restoreDefaults = () => {
-            document.getElementById('restoreModal').style.display = 'flex';
-        };
-
-        window.closeRestoreModal = () => {
-            document.getElementById('restoreModal').style.display = 'none';
-        };
-
-        document.getElementById('confirmRestoreBtn').addEventListener('click', () => {
-            const initialProjects = [
-                {
-                    id: 1,
-                    title: "7amba",
-                    description: "A conversational AI assistant based on a fine-tuned Mamba model, deployed on HuggingFace.",
-                    tags: ["NLP", "Mamba", "HuggingFace"],
-                    link: "https://github.com/drishyakarki/7amba",
-                    icon: "fas fa-robot"
-                },
-                {
-                    id: 2,
-                    title: "GreenScan",
-                    description: "Web-integrated CNN (ResNet-18) for plant disease detection using a Flask API and React frontend.",
-                    tags: ["Computer Vision", "React", "Flask"],
-                    link: "https://github.com/drishyakarki/GreenScan",
-                    icon: "fas fa-leaf"
-                },
-                {
-                    id: 3,
-                    title: "TongueTechies",
-                    description: "It is primarily focused on the development of IndigeTranslate, an application designed to bridge language gaps for indigenous communities..",
-                    tags: ["Python", "Jupyter Notebook", "Dart"],
-                    link: "https://github.com/TongueTechies/",
-                    icon: "fas fa-language"
-                }
-            ];
-
-            const initialResearch = [
-                {
-                    id: 1,
-                    title: "Pixels or Positions? Benchmarking Modalities in Group Activity Recognition",
-                    description: "A study on broadcasting video vs. agent tracking in team sports like soccer. Submitted to CVPR 2025.",
-                    tag: "Nov 2025",
-                    link: "https://arxiv.org/abs/2511.12606",
-                    icon: "fas fa-video"
-                },
-                {
-                    id: 2,
-                    title: "EasyMath: A 0-shot Math Benchmark for SLMs",
-                    description: "A benchmark for small language models (SLMs) on arithmetic and algebraic problems.",
-                    tag: "May 2025",
-                    link: "https://arxiv.org/abs/2505.14852",
-                    icon: "fas fa-microchip"
-                }
-            ];
-
-            const initialImportant = [
-                {
-                    id: 1,
-                    title: "Accepted into KAUST",
-                    description: "Started working as a Research Engineer at King Abdullah University of Science and Technology.",
-                    tag: "Career",
-                    link: "#",
-                    icon: "fas fa-briefcase"
-                }
-            ];
-
-            localStorage.setItem('projects', JSON.stringify(initialProjects));
-            localStorage.setItem('research', JSON.stringify(initialResearch));
-            localStorage.setItem('important', JSON.stringify(initialImportant));
-            logActivity('Restored portfolio to initial state');
-            location.reload();
-        });
     </script>
 </body>
 
