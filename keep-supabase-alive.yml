@@ -1,17 +1,34 @@
-name: Keep Supabase Active
+// keep-alive.js
+const { createClient } = require('@supabase/supabase-js');
 
-on:
-  schedule:
-    # Runs at 00:00 UTC on Mondays and Thursdays (every 3-4 days)
-    - cron: '0 0 * * 1,4'
-  workflow_dispatch: # Allows manual trigger from the GitHub Actions tab
+// These will be fed from GitHub Secrets for security
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
-jobs:
-  ping-supabase:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Ping Supabase REST API
-        run: |
-          curl -i -X GET "https://eqijufahytbwxnxszlzf.supabase.co/rest/v1/projects?select=*" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
+if (!supabaseUrl || !supabaseKey) {
+  console.error("Missing Supabase environment variables.");
+  process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+async function pingSupabase() {
+  try {
+    // A simple, lightweight query to check the database
+    const { data, error } = await supabase.from('_analytics').select('*').limit(1); 
+    // Note: If you don't have a table, we can just do a raw health check or RPC
+    
+    // Alternative if you don't want to query a specific table:
+    // const { data, error } = await supabase.rpc('version'); 
+    
+    if (error) throw error;
+    
+    console.log("Successfully pinged Supabase! Project is awake.");
+  } catch (err) {
+    console.error("Error pinging Supabase:", err.message);
+    // If the table doesn't exist, Supabase still processes the request, which keeps it alive.
+    // But to be safe, standard API calls are best.
+  }
+}
+
+pingSupabase();
